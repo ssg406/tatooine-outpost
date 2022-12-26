@@ -1,6 +1,7 @@
 import { useEffect, useReducer } from 'react';
 import axios from 'axios';
 
+// Reducer Actions
 const ACTIONS = {
   MAKE_REQUEST: 'make-request',
   GET_DATA: 'get-data',
@@ -12,6 +13,7 @@ const ACTIONS = {
   SAFE_SEARCH: 'safe-search',
 };
 
+// Initial state passed to reducer
 const initialState = {
   results: [],
   filteredResults: [],
@@ -19,6 +21,7 @@ const initialState = {
   error: null,
 };
 
+// Set of words used to filter out 'dark side' related content
 const darkWords = ['anakin', 'darth', 'palpatine', 'grievous', 'destroyer'];
 
 const reducer = (state, action) => {
@@ -49,6 +52,7 @@ const reducer = (state, action) => {
         ...state,
         error: null,
       };
+    // Returns array of objects whose name property partially matches search text
     case ACTIONS.SEARCH_RESULTS:
       const { searchText } = action.payload;
       const filteredResults = state.results.filter(({ name }) =>
@@ -58,6 +62,8 @@ const reducer = (state, action) => {
         ...state,
         filteredResults,
       };
+    // Uses dynamic object key to sort the filtered list in either ascending
+    // or descending order.
     case ACTIONS.SORT_RESULTS:
       const { sortCondition, isAscending } = action.payload;
       if (isAscending) {
@@ -72,12 +78,12 @@ const reducer = (state, action) => {
       return {
         ...state,
       };
+    // Removes any object in filtered list whose name property matches a list in the dark words array
     case ACTIONS.SAFE_SEARCH:
       const { isSafeSearch } = action.payload;
       if (isSafeSearch) {
-        const darkString = darkWords.join(' ');
         const filteredResults = state.results.filter(({ name }) => {
-          return darkString.includes(name);
+          return !darkWords.find(darkWord => name.toLowerCase().includes(darkWord));
         });
         return {
           ...state,
@@ -103,6 +109,7 @@ export default function useFetchResults(
 ) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
+  // Retrieves data from SWAPI
   const fetchData = async () => {
     dispatch({ type: ACTIONS.MAKE_REQUEST });
 
@@ -111,6 +118,7 @@ export default function useFetchResults(
     try {
       let url = `https://swapi.dev/api/${category}/?page=1`;
 
+      // Continuously retrieves the next page until the API does not return a 'next' url
       while (url) {
         const { data } = await axios.get(url);
         totalResults = totalResults.concat(data.results);
@@ -126,10 +134,12 @@ export default function useFetchResults(
     }
   };
 
+  // New data is fetched when the category is changed
   useEffect(() => {
     fetchData();
   }, [category]);
 
+  // Dispatches search action when searchText is changed
   useEffect(() => {
     dispatch({
       type: ACTIONS.SEARCH_RESULTS,
@@ -137,6 +147,7 @@ export default function useFetchResults(
     });
   }, [searchText]);
 
+  // Dispatches the sort action when the sort condition or isAscending flag is changed
   useEffect(() => {
     dispatch({
       type: ACTIONS.SORT_RESULTS,
@@ -144,6 +155,7 @@ export default function useFetchResults(
     });
   }, [sortCondition, isAscending]);
 
+  // Dispatches safe search action when flag is changed
   useEffect(() => {
     dispatch({ type: ACTIONS.SAFE_SEARCH, payload: { isSafeSearch } });
   }, [isSafeSearch]);

@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { FaSort } from 'react-icons/fa';
+import { useState } from "react";
+import { FaSort } from "react-icons/fa";
 
 const ColumnSortItem = ({ attribute, sortName, handleClick }) => {
   const [isAscending, setIsAscending] = useState(true);
 
+  // When clicked, isAscending is toggled and passed with the sort category up the component tree
   const handleSortChange = (e) => {
     setIsAscending(() => !isAscending);
     handleClick(sortName, isAscending);

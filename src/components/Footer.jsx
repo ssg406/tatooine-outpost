@@ -1,11 +1,11 @@
-import { FaLinkedin, FaGithub } from 'react-icons/fa';
+import { FaLinkedin, FaGithub } from "react-icons/fa";
 
 const Footer = () => {
   return (
-    <footer className='bg-neutral-800 p-4'>
+    <footer className='bg-neutral-800 p-4 sticky top-[100vh] w-full'>
       <div className='md:container md:mx-auto flex justify-center gap-10 text-center text-neutral-500'>
         <p>
-          Created by{' '}
+          Created by{" "}
           <a
             className='underline font-bold'
             href='https://samueljones.codes'
